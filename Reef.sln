@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual C++ Express 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Reef", "Reef.vcxproj", "{C78C9947-FEBF-421E-8A8C-5E0F56E7AD00}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Debug|Win64 = Debug|Win64
+		Release|Win32 = Release|Win32
+		Release|Win64 = Release|Win64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C78C9947-FEBF-421E-8A8C-5E0F56E7AD00}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C78C9947-FEBF-421E-8A8C-5E0F56E7AD00}.Debug|Win32.Build.0 = Debug|Win32
+		{C78C9947-FEBF-421E-8A8C-5E0F56E7AD00}.Debug|Win64.ActiveCfg = Debug|x64
+		{C78C9947-FEBF-421E-8A8C-5E0F56E7AD00}.Debug|Win64.Build.0 = Debug|x64
+		{C78C9947-FEBF-421E-8A8C-5E0F56E7AD00}.Release|Win32.ActiveCfg = Release|Win32
+		{C78C9947-FEBF-421E-8A8C-5E0F56E7AD00}.Release|Win32.Build.0 = Release|Win32
+		{C78C9947-FEBF-421E-8A8C-5E0F56E7AD00}.Release|Win64.ActiveCfg = Release|x64
+		{C78C9947-FEBF-421E-8A8C-5E0F56E7AD00}.Release|Win64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

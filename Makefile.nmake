@@ -1,0 +1,24 @@
+NAME=Reef
+EXT=exe
+TARGET="$(NAME).$(EXT)"
+CXX=cl /TP /c
+INCLUDEPATH=/I"$(DXSDK_DIR)/Include"
+CXXFLAGS=/EHsc /arch:SSE2 /Ox /fp:fast
+LINK=link
+LIBPATH=/libpath:"$(DXSDK_DIR)/Lib/$(PROCESSOR_ARCHITECTURE)"
+LINKFLAGS=/nodefaultlib /subsystem:windows /machine:$(PROCESSOR_ARCHITECTURE)
+CXXLIBS=libcmt.lib libcpmt.lib
+SYSLIBS=kernel32.lib user32.lib gdi32.lib d3d11.lib d3dx11.lib
+LIBS=$(CXXLIBS) $(SYSLIBS)
+
+all: exe
+
+exe: objs
+	$(LINK) $(LIBPATH) $(LINKFLAGS) /out:$(TARGET) *.obj $(LIBS)
+
+objs:
+	$(CXX) $(INCLUDEPATH) $(CXXFLAGS) *.cpp
+
+clean:
+	del /F /Q *.exe
+	del /F /Q *.obj
