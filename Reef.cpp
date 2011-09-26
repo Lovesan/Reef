@@ -71,7 +71,7 @@ struct Wave
 {
     XMFLOAT2 dir;
     FLOAT length;
-    FLOAT crestFactor;
+    FLOAT amp;
 };
 
 void InitWindow();
