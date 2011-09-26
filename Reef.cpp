@@ -201,7 +201,7 @@ void Render()
         psBuffer.waterColor = XMFLOAT3(0, 0.5f, 1);
         psBuffer.d = 0.7f;
         psBuffer.s = 0.4f;
-        psBuffer.reflectivity = 0.6f;
+        psBuffer.reflectivity = 0.3f;
         psBuffer.transmittance = 0.9f;
 
         // draw skybox
