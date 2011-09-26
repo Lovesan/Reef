@@ -40,6 +40,7 @@ struct Exception
     }
 };
 
+__declspec(align(16))
 struct VertexShaderConstantBuffer
 {
 	XMMATRIX worldViewProjection;
@@ -49,16 +50,21 @@ struct VertexShaderConstantBuffer
     FLOAT crestFactor;
 };
 
+__declspec(align(16))
 struct PixelShaderConstantBuffer
 {
-    XMFLOAT3 eyePos;    
-    FLOAT d;
-    XMFLOAT3 lightPos;
-    FLOAT s;
-    XMFLOAT3 lightColor;
+    XMFLOAT3 eyePos;
     FLOAT reflectivity;
-    XMFLOAT3 waterColor;
+    XMFLOAT3 lightDir;
     FLOAT transmittance;
+    XMFLOAT3 lightColor;
+    FLOAT freshnelPower;
+    XMFLOAT3 waterColor;
+    FLOAT freshnelScale;
+    XMFLOAT3 etaRatio;
+    FLOAT freshnelBias;
+    FLOAT specularFactor;
+    FLOAT shininess;
 };
 
 struct Wave
@@ -105,7 +111,7 @@ ID3D11Buffer * psCB = NULL;
 XMMATRIX waterWorld;
 INT64 counter;
 FLOAT time = 0.0f;
-FLOAT waveInterval = 4;
+FLOAT waveInterval = 5;
 
 UINT width;
 UINT height;
@@ -165,7 +171,7 @@ void Render()
         time += dt;
         if(time > 1.0f)
             time = 0.0f;
-
+        
         deviceContext->OMSetRenderTargets(1, &backBufferRTV, depthStencilView);
 
         FLOAT clearColor[4] = {0.0f, 0.5f, 1.0f, 1.0f};
@@ -189,7 +195,7 @@ void Render()
 
         VertexShaderConstantBuffer vsBuffer;
         vsBuffer.time = time;
-        vsBuffer.crestFactor = 0.3f;
+        vsBuffer.crestFactor = 0.2f;
         D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
         waveBufferSRV->GetDesc(&srvDesc);
         vsBuffer.waveCount = srvDesc.Buffer.NumElements;
@@ -197,19 +203,23 @@ void Render()
         PixelShaderConstantBuffer psBuffer;       
         psBuffer.eyePos = eyePos;
         psBuffer.lightColor = XMFLOAT3(1, 1, 0.8f);
-        psBuffer.lightPos = XMFLOAT3(0, 1, 0);
+        psBuffer.lightDir = XMFLOAT3(1, 1, 1);
         psBuffer.waterColor = XMFLOAT3(0, 0.5f, 1);
-        psBuffer.d = 0.7f;
-        psBuffer.s = 0.4f;
-        psBuffer.reflectivity = 0.3f;
+        psBuffer.etaRatio = XMFLOAT3(0.85f, 0.85f, 0.85f);
+        psBuffer.reflectivity = 0.9f;
         psBuffer.transmittance = 0.9f;
+        psBuffer.freshnelPower = 1;
+        psBuffer.freshnelScale = 0.9f;
+        psBuffer.freshnelBias = 0;
+        psBuffer.specularFactor = 1;
+        psBuffer.shininess = 100;
 
         // draw skybox
         
         deviceContext->IASetVertexBuffers(0, 1, &skyVB, &stride, &offset);
         deviceContext->IASetIndexBuffer(skyIB, DXGI_FORMAT_R32_UINT, 0);
 
-        vsBuffer.world = XMMatrixIdentity();
+        vsBuffer.world = XMMatrixScaling(50, 50, 50);
         vsBuffer.worldViewProjection = vsBuffer.world * view * projection;
         
         deviceContext->UpdateSubresource(vsCB, 0, NULL, &vsBuffer, 0, 0);
@@ -383,11 +393,11 @@ void InitCamera()
     viewport.TopLeftX = 0;
     viewport.TopLeftY = 0;
 
-    XMFLOAT3 eye = eyePos = XMFLOAT3(-0.9f, 0.03f, -0.9f);
-    XMFLOAT3 to = XMFLOAT3(0.707f, 0, 0.707f);
+    XMFLOAT3 eye = eyePos = XMFLOAT3(-1, 0.5f, -1);
+    XMFLOAT3 at = XMFLOAT3(0, 0, 0);
     XMFLOAT3 up = XMFLOAT3(0, 1, 0);
-    view = XMMatrixLookToLH(XMLoadFloat3(&eye),
-                            XMLoadFloat3(&to),
+    view = XMMatrixLookAtLH(XMLoadFloat3(&eye),
+                            XMLoadFloat3(&at),
                             XMLoadFloat3(&up));    
 
     projection = XMMatrixPerspectiveFovLH(
@@ -663,9 +673,8 @@ void InitResources()
 
     Wave waves[] = 
     {
-        { XMFLOAT2(-0.70710677f,  0.70710677f), 0.2f, 0.002f },
-        { XMFLOAT2(0.70710677f,  -0.70710677f), 0.8f, 0.001f },
-        { XMFLOAT2(-1, 0), 0.5f, 0.004f },
+        { XMFLOAT2(-0.70710677f,  0.70710677f), 2, 0.01f },
+        { XMFLOAT2(-1, 0), 0.8f, 0.0035f }
     };
 
     D3D11_BUFFER_DESC bd;

@@ -1,8 +1,6 @@
 #define PI (3.14159265)
 #define G (9.8)
 #define PHASE (PI*2)
-#define ETA_RATIO (1/1.3333)
-#define SHININESS (50)
 
 cbuffer VertexShaderConstantBuffer : register(b0)
 {
@@ -16,13 +14,17 @@ cbuffer VertexShaderConstantBuffer : register(b0)
 cbuffer PixelShaderConstantBuffer : register(b0)
 {
     float3 eyePos;
-    float d;
-    float3 lightPos;
-    float s;
-    float3 lightColor;
     float reflectivity;
-    float3 waterColor;
+    float3 lightDir;
     float transmittance;
+    float3 lightColor;
+    float freshnelPower;
+    float3 waterColor;
+    float freshnelScale;
+    float3 etaRatio;
+    float freshnelBias;
+    float specularFactor;
+    float shininess;
 };
 
 TextureCube cubeMap : register(t0);
@@ -97,24 +99,33 @@ void WaterPS(PS_INPUT input, out float4 color : SV_Target)
 {
     float3 p = input.vPos;
     float3 n = normalize(input.norm);
+    float3 i = normalize(p - eyePos);
+    float3 r = reflect(i, n);
+    float3 l = normalize(lightDir);
 
-    float3 l = normalize(lightPos - p);
-    float diffuseLight = max(dot(n,l), 0);
-    float3 diffuse = d * waterColor * diffuseLight;
+    float3 tRed = refract(i, n, etaRatio.r);
+    float3 tGreen = refract(i, n, etaRatio.g);
+    float3 tBlue = refract(i, n, etaRatio.b);
+    
+    float reflectionFactor = freshnelBias +
+                             freshnelScale * pow(1 + dot(i, n),
+                                                 freshnelPower);
 
-    float3 v = normalize(eyePos - p);
-    float3 h = normalize(l + v);
-    float specularLight = pow(max(dot(n, h), 0), SHININESS);
-    if(diffuseLight <= 0) specularLight = 0;
-    float3 specular = s * lightColor * specularLight;
+    float3 reflectedColor = lerp(waterColor, cubeMap.Sample(anisotropic, r), reflectivity);
+    
+    float3 refractedColor = lerp(waterColor,
+                                 float3(cubeMap.Sample(anisotropic, tRed).r,
+                                        cubeMap.Sample(anisotropic, tGreen).g,
+                                        cubeMap.Sample(anisotropic, tBlue).b),
+                                 transmittance);
 
-    float3 decalColor = diffuse + specular;    
-    float3 reflectionColor = cubeMap.Sample(anisotropic, reflect(normalize(p - eyePos), n));
-    float3 refractionColor = cubeMap.Sample(anisotropic, refract(normalize(p - eyePos), n, ETA_RATIO));
+    float3 specularColor =  lightColor * specularFactor * pow(dot(reflect(l, n), i), shininess); 
 
     color.a = 1;
-    color.rgb = lerp(decalColor, refractionColor, transmittance);
-    color.rgb = lerp(color.xyz, reflectionColor, reflectivity);
+    color.rgb = lerp(refractedColor,
+                     reflectedColor,
+                     reflectionFactor) +
+                specularColor;
 }
 
 void SkyPS(float4 pos : SV_Position, float3 vPos : TEXCOORD, out float4 color : SV_Target)
