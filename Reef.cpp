@@ -58,11 +58,11 @@ struct PixelShaderConstantBuffer
     XMFLOAT3 lightDir;
     FLOAT transmittance;
     XMFLOAT3 lightColor;
-    FLOAT freshnelPower;
+    FLOAT fresnelPower;
     XMFLOAT3 waterColor;
-    FLOAT freshnelScale;
+    FLOAT fresnelScale;
     XMFLOAT3 etaRatio;
-    FLOAT freshnelBias;
+    FLOAT fresnelBias;
     FLOAT specularFactor;
     FLOAT shininess;
 };
@@ -208,9 +208,9 @@ void Render()
         psBuffer.etaRatio = XMFLOAT3(0.85f, 0.85f, 0.85f);
         psBuffer.reflectivity = 0.9f;
         psBuffer.transmittance = 0.9f;
-        psBuffer.freshnelPower = 1;
-        psBuffer.freshnelScale = 0.9f;
-        psBuffer.freshnelBias = 0;
+        psBuffer.fresnelPower = 1;
+        psBuffer.fresnelScale = 0.9f;
+        psBuffer.fresnelBias = 0;
         psBuffer.specularFactor = 1;
         psBuffer.shininess = 100;
 

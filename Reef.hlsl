@@ -18,11 +18,11 @@ cbuffer PixelShaderConstantBuffer : register(b0)
     float3 lightDir;
     float transmittance;
     float3 lightColor;
-    float freshnelPower;
+    float fresnelPower;
     float3 waterColor;
-    float freshnelScale;
+    float fresnelScale;
     float3 etaRatio;
-    float freshnelBias;
+    float fresnelBias;
     float specularFactor;
     float shininess;
 };
@@ -107,9 +107,9 @@ void WaterPS(PS_INPUT input, out float4 color : SV_Target)
     float3 tGreen = refract(i, n, etaRatio.g);
     float3 tBlue = refract(i, n, etaRatio.b);
     
-    float reflectionFactor = freshnelBias +
-                             freshnelScale * pow(1 + dot(i, n),
-                                                 freshnelPower);
+    float reflectionFactor = fresnelBias +
+                             fresnelScale * pow(1 + dot(i, n),
+                                                 fresnelPower);
 
     float3 reflectedColor = lerp(waterColor, cubeMap.Sample(anisotropic, r), reflectivity);
     
