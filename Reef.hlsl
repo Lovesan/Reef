@@ -60,7 +60,7 @@ WAVE_SUM GerstnerWaveSum(float2 pos, Buffer<WAVE> waves, int n)
     {
         WAVE wave = waves[i];
         float freq = sqrt(G * 2 * PI / wave.length);
-        float q = 1/(wave.amp * freq) * crestFactor;        
+        float q = 1/(wave.amp * freq * n) * crestFactor;        
         float tmp = q * wave.amp * cos(dot(freq * wave.dir, pos) + PHASE * time);
         sum.pos += float3( tmp * wave.dir.x,
                            wave.amp * sin(dot(freq * wave.dir, pos) + PHASE * time),

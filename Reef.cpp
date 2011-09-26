@@ -195,7 +195,7 @@ void Render()
 
         VertexShaderConstantBuffer vsBuffer;
         vsBuffer.time = time;
-        vsBuffer.crestFactor = 0.2f;
+        vsBuffer.crestFactor = 0.8f;
         D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
         waveBufferSRV->GetDesc(&srvDesc);
         vsBuffer.waveCount = srvDesc.Buffer.NumElements;
